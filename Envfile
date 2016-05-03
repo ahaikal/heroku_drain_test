@@ -5,7 +5,7 @@ enable_defaults! { ENV['RACK_ENV'] != 'production' }
 variable :RACK_ENV
 variable :PORT, :Integer, default: 5000
 variable :MIN_THREADS, :Integer, default: 1
-variable :MAX_THREADS, :Integer, default: 10
+variable :MAX_THREADS, :Integer, default: 2
 variable :AMQP_URL, :String, default: 'amqp://127.0.0.1:5672'
 
 # Drain-tokens with (optional) name (using url-query notation):
@@ -25,7 +25,7 @@ variable :DRAIN_NAME_MAPPING, :Hash, default: {}
 # - drain_token
 # - drain_name (equals drain_token if you haven't provided a name in DRAIN_NAME_MAPPING)
 variable :AMQP_EXCHANGE, :String, default: "bunny-drain"
-variable :AMQP_ROUTING_KEY, :String, default: "heroku.logs.%{drain_name}"
+
 
 group :production do
   variable :WORKERS, :Integer # number of Puma workers

@@ -2,11 +2,14 @@ require 'sinatra'
 require 'bunny'
 require 'connection_pool'
 require 'envied'
+require 'pry'
 
 class BunnyDrain < Sinatra::Base
   $amqp_conn = Bunny.new(ENVied.AMQP_URL).start
   $amqp_channel = ConnectionPool.new(size: ENVied.MAX_THREADS, timeout: 5) {
-    $amqp_conn.create_channel
+    ch = $amqp_conn.create_channel
+    ch.default_exchange
+    ch.queue("bunny", :auto_delete => false)
   }
 
   # Logplex headers:
@@ -15,31 +18,30 @@ class BunnyDrain < Sinatra::Base
   # HTTP_LOGPLEX_DRAIN_TOKEN"=>"",
   # HTTP_USER_AGENT"=>"Logplex/v72"
   post '/' do
-    forbidden_on_unknown_drain_token!
+    # forbidden_on_unknown_drain_token!
     request.body.rewind
-
     $amqp_channel.with do |ch|
       request.body.each do |line|
         log = line.split(/>\d* /).last.to_s.strip
-        puts "Publishing #{log.inspect} to exchange #{exchange_name.inspect} with routing key: #{routing_key.inspect}"
-        ch.topic(exchange_name).publish(log, routing_key: routing_key)
+        puts "Publishing #{log} to exchange #{exchange_name.inspect}"
+        ch.publish(log)
       end
     end
 
-    status 201
+    status 200
   end
 
-  get '/' do
-    "Hello world!"
-  end
+  # get '/' do
+  #   "Hello world!"
+  # end
 
   helpers do
     def exchange_name
-      ENVied.AMQP_EXCHANGE % { drain_name: drain_name, drain_token: drain_token }
+      ENVied.AMQP_EXCHANGE % { drain_name: drain_name }
     end
 
     def routing_key
-      ENVied.AMQP_ROUTING_KEY % { drain_name: drain_name, drain_token: drain_token }
+      ENVied.AMQP_ROUTING_KEY % { drain_name: drain_name }
     end
 
     # Drain-tokens mapped to drain-names.
