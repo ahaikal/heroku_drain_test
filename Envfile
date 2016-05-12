@@ -6,7 +6,10 @@ variable :RACK_ENV
 variable :PORT, :Integer, default: 5000
 variable :MIN_THREADS, :Integer, default: 1
 variable :MAX_THREADS, :Integer, default: 2
-variable :AMQP_URL, :String, default: 'amqp://127.0.0.1:5672'
+variable :AMQP_URL, :String, default: '127.0.0.1'
+variable :AMQP_VHOST, :String, default: '/'
+variable :AMQP_USER, :String, default: 'guest'
+variable :AMQP_PASSWORD, :String, default: 'guest'
 
 # Drain-tokens with (optional) name (using url-query notation):
 #

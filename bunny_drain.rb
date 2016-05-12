@@ -5,7 +5,7 @@ require 'envied'
 require 'pry'
 
 class BunnyDrain < Sinatra::Base
-  $amqp_conn = Bunny.new(ENVied.AMQP_URL).start
+  $amqp_conn = Bunny.new(:host => ENVied.AMQP_URL, :vhost => ENVied.AMQP_VHOST, :user => ENVied.AMQP_USER, :password => ENVied.AMQP_PASSWORD).start
   $amqp_channel = ConnectionPool.new(size: ENVied.MAX_THREADS, timeout: 5) {
     ch = $amqp_conn.create_channel
     ch.default_exchange
