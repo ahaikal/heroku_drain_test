@@ -2,6 +2,7 @@ source "https://rubygems.org"
 
 gem "sinatra"
 gem "puma"
+gem "unicorn"
 gem 'bunny'
 gem 'connection_pool'
 gem 'envied', '~> 0.5.0', github: 'eval/envied', branch: 'master'
